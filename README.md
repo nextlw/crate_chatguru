@@ -21,7 +21,7 @@ Cliente Rust para a API do ChatGuru com suporte completo a webhooks e envio de m
 
 ```toml
 [dependencies]
-chatguru = { git = "https://github.com/willy3087/crate_chatguru.git" }
+chatguru = { git = "https://github.com/nextlw/crate_chatguru.git" }
 tokio = { version = "1.0", features = ["full"] }
 ```
 
@@ -29,7 +29,7 @@ tokio = { version = "1.0", features = ["full"] }
 
 1. Clone o repositório:
 ```bash
-git clone https://github.com/willy3087/crate_chatguru.git
+git clone https://github.com/nextlw/crate_chatguru.git
 cd crate_chatguru
 ```
 
