@@ -135,7 +135,5 @@ pub use error::{ChatGuruError, Result};
 
 // Re-exports de types para conveniência
 pub use types::{
-    ChatGuruPayload, BotContext,
-    EventTypePayload, EventData, GenericPayload,
-    WebhookPayload,
+    BotContext, ChatGuruPayload, EventData, EventTypePayload, GenericPayload, WebhookPayload,
 };

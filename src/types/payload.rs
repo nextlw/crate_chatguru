@@ -25,7 +25,7 @@ pub struct ChatGuruPayload {
 
     // Campos de mídia - formato antigo (media_url, media_type)
     #[serde(default)]
-    pub media_url: Option<String>,  // URL do áudio ou mídia anexada
+    pub media_url: Option<String>, // URL do áudio ou mídia anexada
     #[serde(default)]
     pub media_type: Option<String>, // Tipo da mídia (audio, image, video)
 

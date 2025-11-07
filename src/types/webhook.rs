@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use super::payload::{ChatGuruPayload, EventTypePayload, GenericPayload};
+use serde::{Deserialize, Serialize};
 
 /// Estrutura flexível que aceita múltiplos formatos de webhook
 ///
@@ -48,12 +48,12 @@ impl WebhookPayload {
     pub fn get_contact_name(&self) -> String {
         match self {
             WebhookPayload::ChatGuru(p) => p.nome.clone(),
-            WebhookPayload::EventType(p) => {
-                p.data.lead_name.clone().unwrap_or_else(|| "Contato".to_string())
-            },
-            WebhookPayload::Generic(p) => {
-                p.nome.clone().unwrap_or_else(|| "Contato".to_string())
-            }
+            WebhookPayload::EventType(p) => p
+                .data
+                .lead_name
+                .clone()
+                .unwrap_or_else(|| "Contato".to_string()),
+            WebhookPayload::Generic(p) => p.nome.clone().unwrap_or_else(|| "Contato".to_string()),
         }
     }
 
@@ -70,7 +70,7 @@ impl WebhookPayload {
                 } else {
                     None
                 }
-            },
+            }
             WebhookPayload::EventType(p) => p.data.phone.clone(),
             WebhookPayload::Generic(p) => p.celular.clone(),
         }
@@ -89,7 +89,7 @@ impl WebhookPayload {
                 } else {
                     None
                 }
-            },
+            }
             WebhookPayload::EventType(p) => p.data.annotation.clone(),
             WebhookPayload::Generic(p) => p.mensagem.clone(),
         }
@@ -115,9 +115,7 @@ impl WebhookPayload {
     /// `true` se há mídia (imagem, áudio, vídeo), `false` caso contrário.
     pub fn has_media(&self) -> bool {
         match self {
-            WebhookPayload::ChatGuru(p) => {
-                p.media_url.is_some() || p.url_arquivo.is_some()
-            },
+            WebhookPayload::ChatGuru(p) => p.media_url.is_some() || p.url_arquivo.is_some(),
             _ => false,
         }
     }
@@ -129,9 +127,7 @@ impl WebhookPayload {
     /// `Some(String)` com a URL da mídia, ou `None` se não houver.
     pub fn get_media_url(&self) -> Option<String> {
         match self {
-            WebhookPayload::ChatGuru(p) => {
-                p.media_url.clone().or_else(|| p.url_arquivo.clone())
-            },
+            WebhookPayload::ChatGuru(p) => p.media_url.clone().or_else(|| p.url_arquivo.clone()),
             _ => None,
         }
     }
@@ -155,7 +151,7 @@ impl WebhookPayload {
                         other => format!("application/{}", other),
                     })
                 })
-            },
+            }
             _ => None,
         }
     }

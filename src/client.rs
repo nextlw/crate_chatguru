@@ -1,9 +1,9 @@
 use crate::error::{ChatGuruError, Result};
+use chrono::{DateTime, Utc};
 use reqwest::Client;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
-use chrono::{DateTime, Utc};
 
 /// Cliente HTTP para a API do ChatGuru
 ///
@@ -111,13 +111,14 @@ impl ChatGuruClient {
         &self,
         chat_id: &str,
         phone_number: &str,
-        annotation_text: &str
+        annotation_text: &str,
     ) -> Result<()> {
         // Construir URL com parâmetros
         let phone_id_value = "62558780e2923cc4705beee1"; // Phone ID padrão do sistema
 
         // Limpar número de telefone (remover caracteres especiais)
-        let clean_phone = phone_number.chars()
+        let clean_phone = phone_number
+            .chars()
             .filter(|c| c.is_numeric())
             .collect::<String>();
 
@@ -140,17 +141,13 @@ impl ChatGuruClient {
             clean_phone
         );
 
-        tracing::info!(
-            "Adding annotation to chat {}: {}",
-            chat_id, annotation_text
-        );
+        tracing::info!("Adding annotation to chat {}: {}", chat_id, annotation_text);
 
         // Fazer a requisição POST
-        let response = self.client
-            .post(&url)
-            .send()
-            .await
-            .map_err(|e| ChatGuruError::NetworkError(format!("Failed to add annotation: {}", e)))?;
+        let response =
+            self.client.post(&url).send().await.map_err(|e| {
+                ChatGuruError::NetworkError(format!("Failed to add annotation: {}", e))
+            })?;
 
         let status = response.status();
         let response_text = response.text().await.unwrap_or_default();
@@ -158,7 +155,8 @@ impl ChatGuruClient {
         if status.is_success() || status.as_u16() == 201 {
             tracing::info!(
                 "Annotation added successfully to chat {}: {}",
-                chat_id, response_text
+                chat_id,
+                response_text
             );
 
             // Logar como o legado
@@ -175,7 +173,8 @@ impl ChatGuruClient {
             } else {
                 tracing::error!(
                     "Failed to add annotation. Status: {}, Response: {}",
-                    status, response_text
+                    status,
+                    response_text
                 );
             }
 
@@ -214,13 +213,14 @@ impl ChatGuruClient {
         &self,
         phone_number: &str,
         phone_id: Option<&str>,
-        message: &str
+        message: &str,
     ) -> Result<()> {
         // Construir URL com parâmetros
         let phone_id_value = phone_id.unwrap_or("62558780e2923cc4705beee1");
 
         // Limpar número de telefone (remover caracteres especiais)
-        let clean_phone = phone_number.chars()
+        let clean_phone = phone_number
+            .chars()
             .filter(|c| c.is_numeric())
             .collect::<String>();
 
@@ -248,15 +248,15 @@ impl ChatGuruClient {
 
         tracing::info!(
             "Sending confirmation message to {}: {}",
-            phone_number, message
+            phone_number,
+            message
         );
 
         // Fazer a requisição POST
-        let response = self.client
-            .post(&url)
-            .send()
-            .await
-            .map_err(|e| ChatGuruError::NetworkError(format!("Failed to send message: {}", e)))?;
+        let response =
+            self.client.post(&url).send().await.map_err(|e| {
+                ChatGuruError::NetworkError(format!("Failed to send message: {}", e))
+            })?;
 
         let status = response.status();
         let response_text = response.text().await.unwrap_or_default();
@@ -264,7 +264,8 @@ impl ChatGuruClient {
         if status.is_success() || status.as_u16() == 201 {
             tracing::info!(
                 "Confirmation message sent successfully to {}: {}",
-                phone_number, response_text
+                phone_number,
+                response_text
             );
 
             // Logar como o legado
@@ -281,7 +282,8 @@ impl ChatGuruClient {
             } else {
                 tracing::error!(
                     "Failed to send confirmation message. Status: {}, Response: {}",
-                    status, response_text
+                    status,
+                    response_text
                 );
             }
 
