@@ -1,0 +1,86 @@
+name: Rust CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Rust
+      uses: dtolnay/rust-toolchain@stable
+      
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target/
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        
+    - name: Check formatting
+      run: cargo fmt --all -- --check
+      
+    - name: Run clippy
+      run: cargo clippy --all-targets --all-features -- -D warnings
+      
+    - name: Build
+      run: cargo build --verbose
+      
+    - name: Run tests
+      run: cargo test --verbose
+
+  publish:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Setup Rust
+      uses: dtolnay/rust-toolchain@stable
+      
+    - name: Check if version changed
+      id: version-check
+      run: |
+        # Obter a versão atual do Cargo.toml
+        CURRENT_VERSION=$(grep '^version = ' Cargo.toml | sed 's/version = "\(.*\)"/\1/')
+        echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+        
+        # Verificar se houve mudança na versão comparando com o commit anterior
+        if git diff HEAD~1 Cargo.toml | grep -q '^+version = '; then
+          echo "version_changed=true" >> $GITHUB_OUTPUT
+          echo "Version changed to $CURRENT_VERSION"
+        else
+          echo "version_changed=false" >> $GITHUB_OUTPUT
+          echo "Version not changed"
+        fi
+        
+    - name: Publish to crates.io
+      if: steps.version-check.outputs.version_changed == 'true'
+      run: |
+        echo "Publishing version ${{ steps.version-check.outputs.current_version }} to crates.io..."
+        cargo publish --token ${{ secrets.CRATES_IO_TOKEN }}
+      env:
+        CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+        
+    - name: Create Git Tag
+      if: steps.version-check.outputs.version_changed == 'true'
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git tag "v${{ steps.version-check.outputs.current_version }}"
+        git push origin "v${{ steps.version-check.outputs.current_version }}"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
