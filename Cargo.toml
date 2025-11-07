@@ -5,8 +5,8 @@ edition = "2021"
 authors = ["eLai Integration Team"]
 description = "Cliente completo da API ChatGuru com suporte a webhooks e mensagens"
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/seu-usuario/chatguru"
-homepage = "https://github.com/seu-usuario/chatguru"
+repository = "https://github.com/nextlw/crate_chatguru"
+homepage = "https://github.com/nextlw/crate_chatguru"
 keywords = ["chatguru", "api", "webhook", "messaging"]
 categories = ["api-bindings"]
 
