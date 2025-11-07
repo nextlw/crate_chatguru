@@ -9,6 +9,7 @@ repository = "https://github.com/nextlw/crate_chatguru"
 homepage = "https://github.com/nextlw/crate_chatguru"
 keywords = ["chatguru", "api", "webhook", "messaging"]
 categories = ["api-bindings"]
+include = ["src/**/*", "Cargo.toml", "README.md"]
 
 [lib]
 name = "chatguru"
