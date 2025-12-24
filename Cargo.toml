@@ -10,6 +10,7 @@ homepage = "https://github.com/nextlw/crate_chatguru"
 keywords = ["chatguru", "api", "webhook", "messaging"]
 categories = ["api-bindings"]
 include = ["src/**/*", "Cargo.toml", "README.md"]
+publish = ["nexcode"]
 
 [lib]
 name = "chatguru"

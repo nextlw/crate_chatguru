@@ -1,0 +1,34 @@
+name: Publish to NexCode Registry
+
+on:
+  release:
+    types: [published]
+  push:
+    tags:
+      - 'v*'
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_REGISTRIES_NEXCODE_INDEX: "sparse+https://crates-production.up.railway.app/api/v1/crates/"
+  CARGO_REGISTRIES_NEXCODE_TOKEN: ${{ secrets.NEXCODE_TOKEN }}
+
+jobs:
+  test:
+    name: Test before publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Run tests
+        run: cargo test --verbose
+
+  publish:
+    name: Publish to NexCode Registry
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Publish to NexCode
+        run: cargo publish --registry nexcode
+
